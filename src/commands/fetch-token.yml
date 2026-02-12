@@ -23,24 +23,27 @@ steps:
   - run:
       name: Fetch Installation Token
       command: |
-        header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 -w 0)
+      	base64_websafe_enc() { base64 -w 0 | tr -d '=' | tr '/+' '_-' | tr -d '\n'; }
 
         now=$(date "+%s")
         iat=$((${now} - 60))
         exp=$((${now} + (10 * 60)))
-        payload=$(echo -n "{\"iat\":${iat},\"exp\":${exp},\"iss\":<< parameters.app_id >>}" | base64 -w 0)
+
+        header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64_websafe_enc)
+        payload=$(echo -n "{\"iat\":${iat},\"exp\":${exp},\"iss\":\"<< parameters.app_id >>\"}" | base64_websafe_enc)
 
         unsigned_token="${header}.${payload}"
-        signed_token=$(echo -n "${unsigned_token}" | openssl dgst -binary -sha256 -sign <(echo << parameters.base64_private_key >> | base64 -d) | base64 -w 0)
+        signed_token=$(echo -n "${unsigned_token}" | openssl dgst -binary -sha256 -sign <(echo -n << parameters.base64_private_key >> | base64 -d) | base64_websafe_enc)
 
         jwt="${unsigned_token}.${signed_token}"
 
+        repo_name="<< parameters.repository_name >>"
         installation_token=$(
           curl -s -X POST \
             -H "Authorization: Bearer ${jwt}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/app/installations/<< parameters.installation_id >>/access_tokens" \
-            $([[ -n "<< parameters.repository_name >>" ]] && echo "-d '{"repository":"<< parameters.repository_name >>"}'" || echo "") \
+            ${repo_name:+-d "{\"repositories\":[\"${repo_name}\"]}"}  \
           | jq -r ".token"
         )
         echo "export << parameters.env_name >>=${installation_token}" >> $BASH_ENV
