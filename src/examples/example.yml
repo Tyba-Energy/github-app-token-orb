@@ -1,13 +1,23 @@
-description: Impersonate a GitHub App in a CircleCI Orb
+description: >
+  Generate a GitHub App token and optionally configure git to use it.
+  All parameters default to environment variables, so you can configure
+  everything via your CircleCI context.
 
 usage:
   version: 2.1
   orbs:
-    github-app-token: ostk0069/github-app-token@0.1.0
-  workflows:
-    use-my-orb:
-      jobs:
+    github-app-token: tyba-energy/github-app-token@0.1.0
+  jobs:
+    my-job:
+      docker:
+        - image: cimg/base:current
+      steps:
+        # Minimal usage — reads from GITHUB_APP_ID, GITHUB_APP_PRIVATE_KEY,
+        # and GITHUB_APP_INSTALLATION_ID env vars
+        - github-app-token/fetch-token
+        # With explicit parameters and git URL rewriting
         - github-app-token/fetch-token:
-            app_id: << your app id >>
-            installation_id: << your installation id >>
-            base64_private_key: << your private key >>
+            app_id: $MY_APP_ID
+            base64_private_key: $MY_PRIVATE_KEY
+            installation_id: $MY_INSTALLATION_ID
+            rewrite_git_urls: true
