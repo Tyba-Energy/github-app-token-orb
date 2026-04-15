@@ -1,9 +1,10 @@
 # GitHub App Token Orb
 
-This CircleCI Orb can be used to impersonate a GitHub App when secrets.GITHUB_TOKEN's limitations are too restrictive and a personal access token is not suitable.
+A CircleCI orb that generates short-lived GitHub App installation tokens for use in CI pipelines. Replaces long-lived personal access tokens with scoped, ephemeral tokens.
 
+Forked from [ostk0069/github-app-token-orb](https://github.com/ostk0069/github-app-token-orb).
 
-[![CircleCI Build Status](https://circleci.com/gh/ostk0069/github-app-token-orb.svg?style=shield "CircleCI Build Status")](https://circleci.com/gh/ostk0069/github-app-token-orb) [![CircleCI Orb Version](https://badges.circleci.com/orbs/ostk0069/github-app-token.svg)](https://circleci.com/orbs/registry/orb/ostk0069/github-app-token) [![GitHub License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/ostk0069/github-app-token-orb/master/LICENSE) [![CircleCI Community](https://img.shields.io/badge/community-CircleCI%20Discuss-343434.svg)](https://discuss.circleci.com/c/ecosystem/orbs)
+[![CircleCI Build Status](https://circleci.com/gh/Tyba-Energy/github-app-token-orb.svg?style=shield "CircleCI Build Status")](https://circleci.com/gh/Tyba-Energy/github-app-token-orb) [![CircleCI Orb Version](https://badges.circleci.com/orbs/tyba-energy/github-app-token.svg)](https://circleci.com/orbs/registry/orb/tyba-energy/github-app-token) [![GitHub License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/Tyba-Energy/github-app-token-orb/master/LICENSE)
 
 ## Usage
 
@@ -41,10 +42,10 @@ repository_name|GitHub Repository Name|No|""	|string
 
 ## Resources
 
-[CircleCI Orb Registry Page](https://circleci.com/orbs/registry/orb/ostk0069/github-app-token) - The official registry page of this orb for all versions, executors, commands, and jobs described.
+[CircleCI Orb Registry Page](https://circleci.com/orbs/registry/orb/tyba-energy/github-app-token) - The official registry page of this orb for all versions, executors, commands, and jobs described.
 
 [CircleCI Orb Docs](https://circleci.com/docs/2.0/orb-intro/#section=configuration) - Docs for using, creating, and publishing CircleCI Orbs.
 
 ### How to Contribute
 
-We welcome [issues](https://github.com/ostk0069/github-app-token-orb/issues) to and [pull requests](https://github.com/ostk0069/github-app-token-orb/pulls) against this repository!
+We welcome [issues](https://github.com/Tyba-Energy/github-app-token-orb/issues) to and [pull requests](https://github.com/Tyba-Energy/github-app-token-orb/pulls) against this repository!
