@@ -13,19 +13,21 @@ executors:
       - image: cimg/base:current
   node:
     docker:
-      - image: cimg/node:16.19.0
+      - image: cimg/node:22.14
   ruby:
     docker:
-      - image: cimg/ruby:3.1.2-node
+      - image: cimg/ruby:3.3
+  python:
+    docker:
+      - image: cimg/python:3.13
 
 commands:
   fetch-github-app-token:
     steps:
-      # this app is just a tester. this does not have any permission. just generates token.
       - github-app-token/fetch-token:
-          app_id: $GITHUB_APP_TOKEN_TESER_ID
-          installation_id: 33287507
-          base64_private_key: $GITHUB_APP_TOKEN_TESTER_PRIVATE_PEM_BASE64
+          app_id: $GITHUB_APP_ID
+          installation_id: $GITHUB_APP_INSTALLATION_ID
+          base64_private_key: $GITHUB_APP_PRIVATE_KEY
 
 jobs:
   command-tests:
@@ -37,7 +39,7 @@ jobs:
     steps:
       - checkout
       - fetch-github-app-token
-      - run: echo $GITHUB_APP_TOKEN
+      - run: echo "${GITHUB_TOKEN:0:12}..."
 
 workflows:
   test-deploy:
@@ -52,6 +54,10 @@ workflows:
           name: command-tests-ruby
           run_executor: ruby
           filters: *filters
+      - command-tests:
+          name: command-tests-python
+          run_executor: python
+          filters: *filters
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
@@ -61,6 +67,9 @@ workflows:
           requires:
             - orb-tools/pack
             - command-tests
+            - command-tests-node
+            - command-tests-ruby
+            - command-tests-python
           context: orb-publishing
           filters:
             branches:

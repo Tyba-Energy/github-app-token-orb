@@ -1,23 +1,35 @@
 description: >
-  Fetch Installation Token as GITHUB_APP_TOKEN
+  Fetch a GitHub App installation token and export it as an environment variable.
+  Optionally configures git to use the token for all GitHub operations.
 parameters:
   app_id:
     type: string
+    default: $GITHUB_APP_ID
     description: "ID of the GitHub App"
   installation_id:
-    type: integer
-    description: "The ID of the installation for which the token will be requested (defaults to the ID of the repository's installation)"
+    type: string
+    default: $GITHUB_APP_INSTALLATION_ID
+    description: "The ID of the installation for which the token will be requested"
   base64_private_key:
     type: string
-    description: "Base64 encoded Private key of the GitHub App"
+    default: $GITHUB_APP_PRIVATE_KEY
+    description: "Base64 encoded private key of the GitHub App"
   env_name:
     type: string
-    default: GITHUB_APP_TOKEN
-    description: "Enable to Customize Token ENV Name"
+    default: GITHUB_TOKEN
+    description: "Name of the environment variable to export the token as"
   repository_name:
     type: string
     default: ""
-    description: "GitHub Repository Name"
+    description: "GitHub repository name (optional, scopes token to a single repo)"
+  rewrite_git_urls:
+    type: boolean
+    default: false
+    description: "Configure git to rewrite GitHub SSH URLs to use HTTPS with the token"
+  github_host:
+    type: string
+    default: "github.com"
+    description: "GitHub hostname (for GitHub Enterprise Server)"
 steps:
   - jq/install
   - run:
@@ -39,8 +51,16 @@ steps:
           curl -s -X POST \
             -H "Authorization: Bearer ${jwt}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/app/installations/<< parameters.installation_id >>/access_tokens" \
-            $([[ -n "<< parameters.repository_name >>" ]] && echo "-d '{"repository":"<< parameters.repository_name >>"}'" || echo "") \
+            "$(if [ "<< parameters.github_host >>" = "github.com" ]; then echo "https://api.github.com"; else echo "https://<< parameters.github_host >>/api/v3"; fi)/app/installations/<< parameters.installation_id >>/access_tokens" \
+            $([[ -n "<< parameters.repository_name >>" ]] && echo "-d '{\"repository\":\"<< parameters.repository_name >>\"}'" || echo "") \
           | jq -r ".token"
         )
         echo "export << parameters.env_name >>=${installation_token}" >> $BASH_ENV
+  - when:
+      condition: << parameters.rewrite_git_urls >>
+      steps:
+        - run:
+            name: Configure git to use GitHub App token
+            command: |
+              git config --global url."https://x-access-token:${<< parameters.env_name >>}@<< parameters.github_host >>/".insteadOf "git@<< parameters.github_host >>:"
+              git config --global --add url."https://x-access-token:${<< parameters.env_name >>}@<< parameters.github_host >>/".insteadOf "ssh://git@<< parameters.github_host >>/"

@@ -1,10 +1,11 @@
 version: 2.1
 
-description: Impersonate a GitHub App in a CircleCI Orb. Make your GitHub Personal Token to be secured.
+description: >
+  Generate a short-lived GitHub App installation token for use in CI pipelines.
+  Replaces long-lived personal access tokens with scoped, ephemeral tokens.
 
 display:
   source_url: "https://github.com/Tyba-Energy/github-app-token-orb"
 
-# If your orb requires other orbs, you can import them like this. Otherwise remove the "orbs" stanza.
 orbs:
-  jq: circleci/jq@2.2.0
+  jq: circleci/jq@3.0.2
